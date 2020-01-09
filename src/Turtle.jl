@@ -576,5 +576,4 @@ function main_proj(move_type_in::String)
                             :lsystem => [draw_lsystem,main_Lsystem,main_Lsystem])
     move_type = Symbol(move_type_in)
     @run_type(move_type,func_type_dict,turtle,dv)
-    # @macroexpand @run_type(Symbol(moveType), func_type_dict, turtle, dv)
 end # function main_proj

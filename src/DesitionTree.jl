@@ -123,12 +123,12 @@ function create_tree(data::DataFrame, features::Tuple, categorycol::Symbol, pers
 end # function create_tree
 
 
-AbstractTrees.children(d::Dict) = [p for p in d]
-AbstractTrees.children(p::Pair) = AbstractTrees.children(p[2])
-function AbstractTrees.printnode(io::IO, p::Pair)
-    str = isempty(AbstractTrees.children(p[2])) ? string(p[1], ": ", p[2]) : string(p[1], ": ")
-    print(io, str)
-end
+# AbstractTrees.children(d::Dict) = [p for p in d]
+# AbstractTrees.children(p::Pair) = AbstractTrees.children(p[2])
+# function AbstractTrees.printnode(io::IO, p::Pair)
+#     str = isempty(AbstractTrees.children(p[2])) ? string(p[1], ": ", p[2]) : string(p[1], ": ")
+#     print(io, str)
+# end
 """
     plottree(tree)
 
@@ -162,30 +162,30 @@ function classify(tree::Dict,data::DataFrame)
 end # function classify
 
 #====== exmaples for building desition tree and calssify new data =============#
-desition_tree_data_weather = DataFrame( outlook = ["sunny","sunny","overcast","rain","rain","rain","overcast","sunny","sunny","rain","sunny","overcast","overcast","rain"],
-                                        temperature = ["hot","hot","hot","mild","cool","cool","cool","mild","cool","mild","mild","mild","hot","mild"],
-                                        humidity = ["high","high","high","high","normal","normal","normal","high","normal","normal","normal","high","normal","high"],
-                                        windy = [0,1,0,0,0,1,1,0,0,0,1,1,0,1],
-                                        class = [0,0,1,1,1,0,1,0,1,1,1,1,1,0])
-desition_tree_data_weather_features = (:outlook,:temperature,:humidity,:windy)
-desition_tree_data_weather_categorycol = :class
-
-tree = create_tree(desition_tree_data_weather,desition_tree_data_weather_features,desition_tree_data_weather_categorycol)
-
-plottree(tree)
-
-data = DataFrame( outlook = "rain", temperature = "hot", humidity = "normal", windy = 0)
-
-@show classify(tree,data)
-
-desition_tree_data_box2 = DataFrame(x = [0,-1,1,0,0], y = [0,0,0,-1,1], out = [0,1,1,1,1])
-desition_tree_data_box_features = (:x,:y)
-desition_tree_data_box_categorycol = :out
-
-tree = create_tree(desition_tree_data_box2,desition_tree_data_box_features,desition_tree_data_box_categorycol)
-
-plottree(tree)
-
-data = DataFrame( y = 1, x = 1)
-
-@show classify(tree,data)
+# desition_tree_data_weather = DataFrame( outlook = ["sunny","sunny","overcast","rain","rain","rain","overcast","sunny","sunny","rain","sunny","overcast","overcast","rain"],
+#                                         temperature = ["hot","hot","hot","mild","cool","cool","cool","mild","cool","mild","mild","mild","hot","mild"],
+#                                         humidity = ["high","high","high","high","normal","normal","normal","high","normal","normal","normal","high","normal","high"],
+#                                         windy = [0,1,0,0,0,1,1,0,0,0,1,1,0,1],
+#                                         class = [0,0,1,1,1,0,1,0,1,1,1,1,1,0])
+# desition_tree_data_weather_features = (:outlook,:temperature,:humidity,:windy)
+# desition_tree_data_weather_categorycol = :class
+#
+# tree = create_tree(desition_tree_data_weather,desition_tree_data_weather_features,desition_tree_data_weather_categorycol)
+#
+# plottree(tree)
+#
+# data = DataFrame( outlook = "rain", temperature = "hot", humidity = "normal", windy = 0)
+#
+# @show classify(tree,data)
+#
+# desition_tree_data_box2 = DataFrame(x = [0,-1,1,0,0], y = [0,0,0,-1,1], out = [0,1,1,1,1])
+# desition_tree_data_box_features = (:x,:y)
+# desition_tree_data_box_categorycol = :out
+#
+# tree = create_tree(desition_tree_data_box2,desition_tree_data_box_features,desition_tree_data_box_categorycol)
+#
+# plottree(tree)
+#
+# data = DataFrame( y = 1, x = 1)
+#
+# @show classify(tree,data)
