@@ -1,0 +1,13 @@
+name = "MyGA"
+uuid = "2ccd1100-32a9-11ea-167a-896b4208f1d5"
+authors = ["k.e <kobied@rnd-hub.com>"]
+version = "0.1.0"
+
+[compat]
+julia = "1"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
