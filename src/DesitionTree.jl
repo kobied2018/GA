@@ -24,6 +24,7 @@ gr()
 #src
 #src this function calculate the category entropy using base 2.
 #src this is good for binary class that can have only two values.
+#src for more information see: [Entropy](https://en.wikipedia.org/wiki/Entropy)
 #src the function output the category entropy
 #src """
 
