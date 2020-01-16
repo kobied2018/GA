@@ -227,7 +227,7 @@ end # function display_epoch
 the main cannonball function
 """
 function fire()
-    epochs = 1000
+    epochs = 100
     items = 100
     height = 10
     width = 10
