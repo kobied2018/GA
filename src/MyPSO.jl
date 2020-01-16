@@ -2,15 +2,24 @@ using Plots
 # using IndexedTables
 gr()
 
+mutable struct XY
+    x::Real
+    y::Real
+    XY(x::T where {T <: Real}, y::T where {T <: Real}) = new(x,y)
+end
 
 mutable struct Particles
     x::Real
     y::Real
     index::Int
     step::Real
+    best::XY
+    velocity::XY
 
-    function Particles(x::T where {T <: Real}, y::T where {T <: Real}, index::T where {T <: Int}, step::T where {T <: Real} = 10)
-        new(x, y, index, step)
+    function Particles(x::T1, y::T2, index::T3, step::T4 = 10) where {T1 <: Real, T2 <: Real, T3 <: Int, T4 <: Real}
+        best = XY(x,y)
+        velocity = XY(getRandomInt(-step, step), getRandomInt(0, step))
+        new(x, y, index, step, best, velocity)
     end
 end # struct Particles
 
@@ -30,13 +39,23 @@ struct Bags_size
     y::Real
     sides::NamedTuple
 
-    function Bags_size(w::T where {T <: Real}, h::T where {T <: Real}, x::T where {T <: Real}, y::T where {T <: Real})
+    function Bags_size(w::T1, h::T2, x::T3, y::T4) where {T1 <: Real, T2 <: Real, T3 <: Real, T4 <: Real}
         temp1 = Set(x .+ [0,w,w,0])
         temp2 = Set(y .+ [0,0,h,h])
         sides = (left = minimum(temp1), rigth = maximum(temp1), bottom = minimum(temp2), top = maximum(temp2))
         new(w,h,x,y,sides)
     end
 end
+
+
+"""
+    getRandomInt(min,max)
+
+generate a random number between min and max
+"""
+function getRandomInt(min,max)
+    return floor(rand() * (max - min + 1)) + min
+end # function
 
 rectangle(w, h, x, y) = Shape(x .+ [0,w,w,0], y .+ [0,0,h,h])
 
@@ -46,7 +65,7 @@ rectangle(w, h, x, y) = Shape(x .+ [0,w,w,0], y .+ [0,0,h,h])
 this function create a plot canvas and place the particles and the
 center of the canvas
 """
-function init(width::T where {T <: Real}, height::T where {T <: Real})
+function init(width::T1, height::T2) where {T1 <: Real, T2 <: Real}
     particles = [Particles(1)]
     bag_size= Bags_size(width/3,height/3,-width/6,-height/6)
     canvas = plot(size = (width,height), legend = false)
@@ -58,13 +77,29 @@ function init(width::T where {T <: Real}, height::T where {T <: Real})
     return (particles, bag_size, canvas)
 end # function init
 
+function init(width::T1, height::T2, number::Int) where {T1 <: Real, T2 <: Real}
+    particles = []
+    for ind in 1:number
+        push!(particles,Particles(ind, 50)])
+    end
+    bag_size= Bags_size(width/3,height/3,-width/6,-height/6)
+    canvas = plot(size = (width,height), legend = false)
+    xlims!(canvas,(-width/2,width/2))
+    ylims!(canvas,(-height/2,height/2))
+    bag = rectangle(bag_size.w,bag_size.h,bag_size.x,bag_size.y)
+    plot!(canvas, bag, opacity = 0.2)
+    for ind in 1:number
+        draw(particles[ind], canvas)
+    end
+    return (particles, bag_size, canvas)
+end # function init
 
 """
     update_all!(particles::Array{Particles}, canvas::Plots.Plot, width::Real, height::Real, bag_size::Bags_size)
 
 this function update all the particles location using the 'move!' funciton
 """
-function update_all!(particles::Array{Particles}, canvas::Plots.Plot, width::T where {T <: Real}, height::T where {T <: Real}, bag_size::Bags_size)
+function update_all!(particles::Array{Particles}, canvas::Plots.Plot, width::T1, height::T2, bag_size::Bags_size) where {T1 <: Real, T2 <: Real}
     for ind in 1:length(particles)
         move!(particles,ind)
         canvas.series_list[ind + 1][:x] = particles[ind].x
@@ -81,12 +116,7 @@ end # function update_all!
 
 this function update a single particle location using the 'move!' funciton
 """
-function update_single!(particles::Array{Particles},
-                        index::T where {T <: Int},
-                        canvas::Plots.Plot,
-                        width::T where {T <: Real},
-                        height::T where {T <: Real},
-                        bag_size::Bags_size)
+function update_single!(particles::Array{Particles}, index::T1, canvas::Plots.Plot, width::T2, height::T3, bag_size::Bags_size) where {T1 <: Int, T2 <: Real, T3 <: Real}
     move!(particles,index)
     canvas.series_list[index + 1][:x] = particles[index].x
     canvas.series_list[index + 1][:y] = particles[index].y
@@ -216,7 +246,7 @@ end # function knn
 
 this function run the main loop and move all the particles at the same time
 """
-function main_all(width::T where {T <: Real} = 600, height::T where {T <: Real} = 600)
+function main_all(width::T1 = 600, height::T2 = 600) where {T1 <: Real, T2 <: Real}
     println("To add a new particles press 'n'")
     println("To add a quit press 'q'")
     (particles, bag_size, canvas) = init(width, height)
@@ -243,7 +273,7 @@ end # function main_all
 
 this function run the main loop and move a single particle at a time
 """
-function main_single(width::T where {T <: Real} = 600, height::T where {T <: Real} = 600)
+function main_single(width::T1 = 600, height::T2 = 600) where {T1 <: Real, T2 <: Real}
     println("To add a new particles press 'n'")
     println("To add a quit press 'q'")
     (particles, bag_size, canvas) = init(width, height)
@@ -268,6 +298,38 @@ function main_single(width::T where {T <: Real} = 600, height::T where {T <: Rea
         end
     end
 end # function main_single
+
+
+"""
+    main_follow_the_best(width::Real = 600, height::Real = 600)
+
+this function run the main loop and move a single particle at a time
+"""
+function main_follow_the_best(width::T1 = 600, height::T2 = 600; number::Int = 20) where {T1 <: Real, T2 <: Real}
+    println("To add a new particles press 'n'")
+    println("To add a quit press 'q'")
+    (particles, bag_size, canvas) = init(width, height, number)
+    current_p = 0
+    @async begin
+        cb(timer) = (current_p = (current_p  % length(particles)) + 1;
+                     if particles[current_p].step > 0
+                         update_single!(particles, current_p, canvas, width, height, bag_size)
+                     end;
+                     display(canvas))
+        global t = Timer(cb,0, interval = 1)
+    end
+    while true
+        kb_input = readline()
+        if lowercase(kb_input) == "n"
+            addparticle(particles,canvas)
+            kb_input = ""
+        end
+        if lowercase(kb_input) == "q"
+            close(t)
+            break
+        end
+    end
+end # function main_follow_the_best
 
 
 """
